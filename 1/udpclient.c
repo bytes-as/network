@@ -62,38 +62,44 @@ int main() {
     //     close(sockfd);
     // }
     else  {
-    // printing the first letter of the file read
-    // printf("%s\n", rec_string);
-    int i=1;
-    char requesti[MAXLINE];
-    do {
-      // char requesti[MAXLINE];
-      // to automate the process of requesting word in the file
-        sprintf(requesti, "WORD%d", i);
-        i++;
-      // scanf("%s", requesti);
-      // printf("\n%s\n", requesti);
-      sendto(sockfd, (const char *)requesti, strlen(requesti), 0,
-    			(const struct sockaddr *) &servaddr, sizeof(servaddr));
+      char readed_filename[MAXLINE];
+      sprintf(readed_filename, "%s_readed", filename);
+      FILE *fptr = fopen(readed_filename, "w");
+      // printing the first letter of the file read
+      // printf("%s\n", rec_string);
+      int i=1;
+      char requesti[MAXLINE];
+      while(1) {
+        // char requesti[MAXLINE];
+        // to automate the process of requesting word in the file
+          sprintf(requesti, "WORD%d", i);
+          i++;
+        // scanf("%s", requesti);
+        // printf("\n%s\n", requesti);
+        sendto(sockfd, (const char *)requesti, strlen(requesti), 0,
+      			(const struct sockaddr *) &servaddr, sizeof(servaddr));
 
-      len = sizeof(cliaddr);
-      n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
-        ( struct sockaddr *) &cliaddr, &len);
-      rec_string[n] = '\0';
-      printf("%s\n", rec_string);
-    } while(strcmp(rec_string, "END") != 0);
-    // while(1){
-    //
-    //   sendto(sockfd, (const char *)filename, strlen(filename), 0,
-    // 		(const struct sockaddr *) &servaddr, sizeof(servaddr));
-    //   len = sizeof(cliaddr);
-    //   n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
-    //     ( struct sockaddr *) &cliaddr, &len);
-    //   rec_string[n] = '\0';
-    // }
+        len = sizeof(cliaddr);
+        n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
+          ( struct sockaddr *) &cliaddr, &len);
+        rec_string[n] = '\0';
+        printf("%s", rec_string);
+        if(strcmp(rec_string, "END\n") == 0)
+          break;
+        fprintf(fptr, "%s", rec_string);
+      }// while(strcmp(rec_string, "END\n") != 0);
+      // while(1){
+      //
+      //   sendto(sockfd, (const char *)filename, strlen(filename), 0,
+      // 		(const struct sockaddr *) &servaddr, sizeof(servaddr));
+      //   len = sizeof(cliaddr);
+      //   n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
+      //     ( struct sockaddr *) &cliaddr, &len);
+      //   rec_string[n] = '\0';
+      // }
     }
-    sendto(sockfd, (const char *)filename, strlen(filename), 0,
-      (const struct sockaddr *) &servaddr, sizeof(servaddr));
-    close(sockfd);
+    // sendto(sockfd, (const char *)filename, strlen(filename), 0,
+    //   (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    // close(sockfd);
     return 0;
 }

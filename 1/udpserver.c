@@ -60,26 +60,34 @@ int main() {
     } else  {
 
 
-      sprintf(buffer, "FOUND");
-      printf("%s", buffer);
-      sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
-        (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
+      // sprintf(buffer, "FOUND");
+      // printf("%s", buffer);
+      // sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
+      //   (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
 
 
       // If file is found then the messages will be read from
       // the file opened
+      char c;
       while(1){
+
+        if(fscanf(fptr, "%s" , buffer) == 1){
+          if((c = fgetc(fptr)) == '\n')
+            sprintf(buffer, "%s\n", buffer);
+          else
+            sprintf(buffer, "%s ", buffer);
+          sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
+            (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
+        } else  {
+          printf("\nclosing server...\n");
+          break;
+        }
+
         len = sizeof(cliaddr);
         n = recvfrom(sockfd, (char *)temp, MAXLINE, 0,
     			( struct sockaddr *) &cliaddr, &len);
         temp[n] = '\0';
 
-        if(fscanf(fptr, "%s" , buffer) == 1)
-          sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
-            (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
-        else{
-          break;
-        }
       }
     }
     // if(fptr = fopen(buffer, "r")){
