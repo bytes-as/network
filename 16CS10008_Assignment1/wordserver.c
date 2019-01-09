@@ -58,52 +58,36 @@ int main() {
       sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
         (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
     } else  {
+      //sending hello message
+      if(fscanf(fptr, "%s", buffer) == 1){
+        sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
+          (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
+      }
 
+      char c; // for the space or endline character tracking
+      // Starting word by word reading in while loop
+      while(fscanf(fptr, "%s" , buffer) == 1){
 
-      // sprintf(buffer, "FOUND");
-      // printf("%s", buffer);
-      // sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
-      //   (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
-
-
-      // If file is found then the messages will be read from
-      // the file opened
-      char c;
-      while(1){
-
-        if(fscanf(fptr, "%s" , buffer) == 1){
-          if((c = fgetc(fptr)) == '\n')
-            sprintf(buffer, "%s\n", buffer);
-          else
-            sprintf(buffer, "%s ", buffer);
-          sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
-            (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
-        } else  {
-          printf("\nclosing server...\n");
-          break;
-        }
-
+        // recieving the request from the client "WORDi"
         len = sizeof(cliaddr);
         n = recvfrom(sockfd, (char *)temp, MAXLINE, 0,
     			( struct sockaddr *) &cliaddr, &len);
         temp[n] = '\0';
 
-      }
-    }
-    // if(fptr = fopen(buffer, "r")){
-    //   fscanf(fptr,"%s", buffer);
-    //   sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
-    //     (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
-    // } else  {
-    //   // if file is not found by the name recieved in buffer
-    //   // this will send a message to client "NOTFOUND"
-    //   sendto(sockfd, (const char *)error_msg, strlen(error_msg), 0,
-    //     (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
-    // }
+        // checking if the word is last of it's line or not
+        if((c = fgetc(fptr)) == '\n')
+          sprintf(buffer, "%s\n", buffer); // setting the buffer and
+          // with end line character
+        else
+          sprintf(buffer, "%s ", buffer); // setting the buffer with a space
 
-    char *buffe = "2";
-    sendto(sockfd, (const char *)buffe, strlen(buffer), 0,
-      (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
+        // sending the message to the client
+        sendto(sockfd, (const char *)buffer, strlen(buffer), 0,
+          (const struct sockaddr *) &cliaddr, sizeof(cliaddr));
+      }
+
+      printf("\nClosing Server...\n");
+    }
 
     return 0;
 }

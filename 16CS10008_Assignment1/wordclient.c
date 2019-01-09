@@ -40,42 +40,45 @@ int main() {
     int n;
     socklen_t len;
     char filename[MAXLINE];
+    char readed_filename[MAXLINE];
+    char *endline = "\n";
+    FILE *fptr;
+    // Taking input of the file name
+    printf("Enter the file name to be read : " );
     scanf("%s", filename);
-    printf("%s\n", filename);
 
-    // step 1
     // sending the file name
     sendto(sockfd, (const char *)filename, strlen(filename), 0,
 			(const struct sockaddr *) &servaddr, sizeof(servaddr));
     //prints the file name that has been sent
-    printf("\nFile name \"%s\" sent\n", filename);
+    printf("\nClient : File name \"%s\" sent to the server...\n\n", filename);
 
+    // rec_string for storing the recieving message
     char rec_string[MAXLINE];
     len = sizeof(cliaddr);
+    // recieving the first message from server.
     n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
       ( struct sockaddr *) &cliaddr, &len);
     rec_string[n] = '\0';
+    printf("Server : %s\n\n", rec_string);
+
+    //  If file not found then printing the error message on client side
     if(strcmp(rec_string, "NOTFOUND") == 0)
       printf("%s\n", "File not found");
-    // else  if(strcmp(rec_string, "FOUND") == 0){
-    //     printf("%s\n", "File found");
-    //     close(sockfd);
-    // }
     else  {
-      char readed_filename[MAXLINE];
-      sprintf(readed_filename, "%s_readed", filename);
-      FILE *fptr = fopen(readed_filename, "w");
+      sprintf(readed_filename, "readed_%s", filename);
+      // Creating a file to write the message that are recieved from the server
+      fptr = fopen(readed_filename, "w");
       // printing the first letter of the file read
       // printf("%s\n", rec_string);
-      int i=1;
+      int i=0;
       char requesti[MAXLINE];
       while(1) {
-        // char requesti[MAXLINE];
         // to automate the process of requesting word in the file
-          sprintf(requesti, "WORD%d", i);
-          i++;
-        // scanf("%s", requesti);
-        // printf("\n%s\n", requesti);
+        i++;
+        sprintf(requesti, "WORD%d", i);
+        printf("Client : %s\n", requesti);
+        // Sending the word request
         sendto(sockfd, (const char *)requesti, strlen(requesti), 0,
       			(const struct sockaddr *) &servaddr, sizeof(servaddr));
 
@@ -83,23 +86,17 @@ int main() {
         n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
           ( struct sockaddr *) &cliaddr, &len);
         rec_string[n] = '\0';
-        printf("%s", rec_string);
-        if(strcmp(rec_string, "END\n") == 0)
+        printf("Server : %s\n", rec_string);
+        // printf("%s", rec_string);
+        if(strcmp(rec_string, "END\n") == 0){
+          fprintf(fptr, "%s", endline);
+          fclose(fptr);
           break;
+        }
         fprintf(fptr, "%s", rec_string);
-      }// while(strcmp(rec_string, "END\n") != 0);
-      // while(1){
-      //
-      //   sendto(sockfd, (const char *)filename, strlen(filename), 0,
-      // 		(const struct sockaddr *) &servaddr, sizeof(servaddr));
-      //   len = sizeof(cliaddr);
-      //   n = recvfrom(sockfd, (char *)rec_string, MAXLINE, 0,
-      //     ( struct sockaddr *) &cliaddr, &len);
-      //   rec_string[n] = '\0';
-      // }
+      }
+      printf("Finished reading file...\n");
     }
-    // sendto(sockfd, (const char *)filename, strlen(filename), 0,
-    //   (const struct sockaddr *) &servaddr, sizeof(servaddr));
-    // close(sockfd);
+    close(sockfd);
     return 0;
 }
