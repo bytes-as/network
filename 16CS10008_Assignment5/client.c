@@ -77,13 +77,14 @@ int main()	{
 				expected_byte = file_size % sizeof(block);
 			recv_byte = recv(sockfd, block, expected_byte, MSG_WAITALL);
 			// printf("block number = %d | recieved byte = %ld | %ld = expected byte\n",block_number, recv_byte, expected_byte);
-			printf("block : %d | bytes send = %ld\n", block_number+1, recv_byte);
+			printf("block : %d | recv byte = %ld\n", block_number+1, recv_byte);
 			write(filefd, block, expected_byte);
 			byte_recieved += recv_byte;
 			block_number++;
 			if(recv_byte < (long int)sizeof(block))
 				break;
 		}
+		close(filefd);
 		for(i=0; i<MAXBUFFER; i++)	buffer[i] = '\0';
 		strcpy(buffer, "The file transfer is successfull");
 		send(sockfd, buffer, strlen(buffer)+1, 0);

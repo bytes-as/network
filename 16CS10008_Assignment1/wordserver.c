@@ -18,7 +18,7 @@ int main() {
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if ( sockfd < 0 ) {
         perror("socket creation failed");
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     memset(&servaddr, 0, sizeof(servaddr));
@@ -32,7 +32,7 @@ int main() {
     if ( bind(sockfd, (const struct sockaddr *)&servaddr,
             sizeof(servaddr)) < 0 ) {
         perror("bind failed");
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     printf("\nServer Running....\n");
